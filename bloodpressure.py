@@ -18,7 +18,7 @@ def get_sheet():
     client = gspread.authorize(creds)
     
     # Replace with your spreadsheet ID (found in the URL of your Google Sheet)
-    spreadsheet_id = "YOUR_SPREADSHEET_ID"
+    spreadsheet_id = "1s9Jhw5hKC7eNabxXkmQExqafNgL15Tt4NRlp1nsByq8"
     sheet = client.open_by_key(spreadsheet_id).sheet1
 
     # Initialize header row if sheet is empty.
