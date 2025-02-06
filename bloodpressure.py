@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import datetime
-import plotly.express as px
+import matplotlib.pyplot as plt
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
@@ -18,10 +18,11 @@ def get_sheet():
     client = gspread.authorize(creds)
     
     # Replace with your spreadsheet ID (found in the URL of your Google Sheet)
-    spreadsheet_id = "1s9Jhw5hKC7eNabxXkmQExqafNgL15Tt4NRlp1nsByq8"
+    spreadsheet_id = "YOUR_SPREADSHEET_ID"
+    spreadsheet_id = "1s9Jhw5hKC7eNabxXkmQExqafNgL15Tt4NRlp1nsByq8"    
     sheet = client.open_by_key(spreadsheet_id).sheet1
 
-    # Initialize header row if sheet is empty.
+    # Initialize header row if the sheet is empty.
     if len(sheet.get_all_values()) == 0:
         sheet.append_row(["timestamp", "systolic", "diastolic", "pulse"])
     return sheet
@@ -76,17 +77,21 @@ elif page == "View Chart":
             df = pd.DataFrame(data)
             # Convert the timestamp column to datetime.
             df['timestamp'] = pd.to_datetime(df['timestamp'])
+            df.sort_values("timestamp", inplace=True)
+
+            # Create a matplotlib figure.
+            fig, ax = plt.subplots(figsize=(10, 6))
+            ax.plot(df["timestamp"], df["systolic"], marker="o", label="Systolic")
+            ax.plot(df["timestamp"], df["diastolic"], marker="o", label="Diastolic")
+            ax.plot(df["timestamp"], df["pulse"], marker="o", label="Pulse")
+            ax.set_xlabel("Timestamp")
+            ax.set_ylabel("Value")
+            ax.set_title("Blood Pressure and Pulse Over Time")
+            ax.legend()
+            plt.xticks(rotation=45)
+            plt.tight_layout()  # Adjust layout so labels don't get cut off.
             
-            # Create a line chart with markers.
-            fig = px.line(
-                df,
-                x="timestamp",
-                y=["systolic", "diastolic", "pulse"],
-                markers=True,
-                labels={"value": "Reading", "timestamp": "Date/Time"},
-                title="Blood Pressure and Pulse Over Time"
-            )
-            st.plotly_chart(fig, use_container_width=True)
+            st.pyplot(fig)
         else:
             st.write("No data available to chart.")
     except Exception as e:
